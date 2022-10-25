@@ -45,10 +45,16 @@ module.exports.details = (req, res, next) => {
 }
 
 // Gets a todo by id and renders the Edit form using the add_edit.ejs template
-module.exports.displayEditPage = (req, res, next) => {
-    
-    // ADD YOUR CODE HERE
-
+module.exports.displayEditPage = async (req, res, next) => {
+    try {
+        let todoToBeUpdated = await TodoModel.findOne({_id : req.params.id}).exec();
+        res.locals.title = 'Editing Todo';
+        res.locals.todo = todoToBeUpdated;
+        res.status(200).render('todo/add_edit')
+    } catch (error) {
+        console.log(error);
+        res.end(error);
+    }
 }
 
 // Processes the data submitted from the Edit form to update a todo
@@ -70,17 +76,21 @@ module.exports.processEditPage = (req, res, next) => {
 }
 
 // Deletes a todo based on its id.
-module.exports.performDelete = (req, res, next) => {
-
-    // ADD YOUR CODE HERE
-
+module.exports.performDelete = async (req, res, next) => {
+    try {
+        await TodoModel.deleteOne({_id: req.params.id});
+        req.flash('success' , 'Deleted Sucessfully');
+        res.redirect('/todo/list'); 
+    } catch (error) {
+        next(error)
+    }
 }
 
 // Renders the Add form using the add_edit.ejs template
 module.exports.displayAddPage = (req, res, next) => {
-
-    // ADD YOUR CODE HERE          
-
+    res.locals.title = 'Add new Todo';
+    res.locals.todo = {};
+    res.status(200).render('todo/add_edit');
 }
 
 // Processes the data submitted from the Add form to create a new todo
