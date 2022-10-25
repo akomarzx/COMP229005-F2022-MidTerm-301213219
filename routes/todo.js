@@ -7,7 +7,12 @@ let todoController = require('../controllers/todo');
 function requireAuth(req, res, next)
 {
     // check if the user is logged in
-    
+    if(req.isAuthenticated()){
+        return next()
+    }else{
+        req.session.url = req.originalUrl;
+        res.redirect('/users/signin');
+    }
     // ADD YOUR CODE HERE        
 
 }
@@ -18,15 +23,18 @@ router.get('/list', todoController.todoList);
 // Route for Details
 router.get('/details/:id', todoController.details);
 
+
+router.use(requireAuth);
+
 // Routers for edit
-router.get('/edit/:id', todoController.displayEditPage);
+router.get('/edit/:id',todoController.displayEditPage);
 router.post('/edit/:id', todoController.processEditPage);
 
 // Delete
 router.get('/delete/:id', todoController.performDelete);
 
 /* GET Route for displaying the Add page - CREATE Operation */
-router.get('/add', todoController.displayAddPage);
+router.get('/add',todoController.displayAddPage);
 
 /* POST Route for processing the Add page - CREATE Operation */
 router.post('/add', todoController.processAddPage);
