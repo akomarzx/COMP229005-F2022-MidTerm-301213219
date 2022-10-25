@@ -118,7 +118,7 @@ module.exports.processAddPage = async (req, res, next) => {
         await TodoModel.create({
             task : req.body.task,
             description: req.body.description,
-            complete : req.body.complete ? false : true
+            complete : req.body.complete ? true : false
         });
         res.redirect('/todo/list');
     } catch (error) {
