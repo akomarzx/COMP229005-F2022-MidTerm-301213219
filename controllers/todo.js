@@ -58,7 +58,7 @@ module.exports.displayEditPage = async (req, res, next) => {
 }
 
 // Processes the data submitted from the Edit form to update a todo
-module.exports.processEditPage = (req, res, next) => {
+module.exports.processEditPage = async (req, res, next) => {
 
     let id = req.params.id
     
@@ -72,17 +72,27 @@ module.exports.processEditPage = (req, res, next) => {
     });
 
     // ADD YOUR CODE HERE
-
+    try {
+        await TodoModel.updateOne({_id : req.params.id},{
+            task : req.body.task,
+            description: req.body.description,
+            complete : req.body.complete ? true : false
+        });
+        res.redirect('/todo/list');
+    } catch (error) {
+        console.log(error);
+        res.end(error);
+    }    
 }
 
 // Deletes a todo based on its id.
 module.exports.performDelete = async (req, res, next) => {
     try {
         await TodoModel.deleteOne({_id: req.params.id});
-        req.flash('success' , 'Deleted Sucessfully');
         res.redirect('/todo/list'); 
     } catch (error) {
-        next(error)
+        console.log(error);
+        res.end(error);
     }
 }
 
@@ -94,7 +104,7 @@ module.exports.displayAddPage = (req, res, next) => {
 }
 
 // Processes the data submitted from the Add form to create a new todo
-module.exports.processAddPage = (req, res, next) => {
+module.exports.processAddPage = async (req, res, next) => {
 
     console.log(req.body);
 
@@ -104,7 +114,15 @@ module.exports.processAddPage = (req, res, next) => {
         description: req.body.description,
         complete: req.body.complete ? true : false
     });
-
-    // ADD YOUR CODE HERE
-    
+    try {
+        await TodoModel.create({
+            task : req.body.task,
+            description: req.body.description,
+            complete : req.body.complete ? false : true
+        });
+        res.redirect('/todo/list');
+    } catch (error) {
+        console.log(error);
+        res.end(error);
+    }    
 }
