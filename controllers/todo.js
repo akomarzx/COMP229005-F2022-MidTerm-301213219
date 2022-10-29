@@ -1,6 +1,6 @@
 // create a reference to the model
 let TodoModel = require('../models/todo');
-
+let mongoose = require('mongoose');
 // Gets all todo from the Database and renders the page to list them all.
 module.exports.todoList = function(req, res, next) {  
 
@@ -73,11 +73,7 @@ module.exports.processEditPage = async (req, res, next) => {
 
     // ADD YOUR CODE HERE
     try {
-        await TodoModel.updateOne({_id : req.params.id},{
-            task : req.body.task,
-            description: req.body.description,
-            complete : req.body.complete ? true : false
-        });
+        await TodoModel.updateOne({_id : req.params.id}, updatedTodo).exec();
         res.redirect('/todo/list');
     } catch (error) {
         console.log(error);
@@ -114,14 +110,13 @@ module.exports.processAddPage = async (req, res, next) => {
         description: req.body.description,
         complete: req.body.complete ? true : false
     });
+
+    newTodo['_id'] = mongoose.Types.ObjectId();
+
     try {
-        await TodoModel.create({
-            task : req.body.task,
-            description: req.body.description,
-            complete : req.body.complete ? true : false
-        });
+        await TodoModel.create(newTodo);
         res.redirect('/todo/list');
-    } catch (error) {
+} catch (error) {
         console.log(error);
         res.end(error);
     }    
